@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/IrakliGiorgadze/celeritas"
+
 	up "github.com/upper/db/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -22,6 +24,13 @@ type User struct {
 
 func (u *User) Table() string {
 	return "users"
+}
+
+func (u *User) Validate(validator *celeritas.Validation) {
+	validator.Check(u.LastName != "", "last_name", "Last name must be provided")
+	validator.Check(u.FirstName != "", "first_name", "First name must be provided")
+	validator.Check(u.Email != "", "email", "Email name must be provided")
+	validator.IsEmail("email", u.Email)
 }
 
 func (u *User) GetAll() ([]*User, error) {
@@ -53,7 +62,7 @@ func (u *User) GetByEmail(email string) (*User, error) {
 	res = collection.Find(up.Cond{"user_id =": theUser.ID, "expiry >": time.Now()}).OrderBy("created_at desc")
 	err = res.One(&token)
 	if err != nil {
-		if !errors.Is(up.ErrNilRecord, err) && !errors.Is(up.ErrNoMoreRows, err) {
+		if err != up.ErrNilRecord && err != up.ErrNoMoreRows {
 			return nil, err
 		}
 	}
@@ -79,7 +88,7 @@ func (u *User) Get(id int) (*User, error) {
 	res = collection.Find(up.Cond{"user_id =": theUser.ID, "expiry >": time.Now()}).OrderBy("created_at desc")
 	err = res.One(&token)
 	if err != nil {
-		if !errors.Is(up.ErrNilRecord, err) && !errors.Is(up.ErrNoMoreRows, err) {
+		if err != up.ErrNilRecord && err != up.ErrNoMoreRows {
 			return nil, err
 		}
 	}
@@ -167,4 +176,13 @@ func (u *User) PasswordMatches(plainText string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (u *User) CheckForRememberToken(id int, token string) bool {
+	var rememberToken RememberToken
+	rt := RememberToken{}
+	collection := upper.Collection(rt.Table())
+	res := collection.Find(up.Cond{"user_id": id, "remember_token": token})
+	err := res.One(&rememberToken)
+	return err == nil
 }
