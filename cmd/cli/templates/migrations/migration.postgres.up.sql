@@ -4,7 +4,7 @@
 --     created_at TIMESTAMP,
 --     updated_at TIMESTAMP
 -- );
-
+--
 -- add auto update of updated_at. If you already have this trigger
 -- you can delete the next 7 lines
 -- CREATE OR REPLACE FUNCTION trigger_set_timestamp()
@@ -14,7 +14,7 @@
 -- RETURN NEW;
 -- END;
 -- $$ LANGUAGE plpgsql;
-
+--
 -- CREATE TRIGGER set_timestamp
 --     BEFORE UPDATE ON some_table
 --     FOR EACH ROW
