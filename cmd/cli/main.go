@@ -21,11 +21,17 @@ func main() {
 		exitGracefully(err)
 	}
 
-	setup()
+	setup(arg1, arg2)
 
 	switch arg1 {
 	case "help":
 		showHelp()
+
+	case "new":
+		if arg2 == "" {
+			exitGracefully(errors.New("new requires an app name"))
+		}
+		doNew(arg2)
 
 	case "version":
 		color.Yellow("Application version: " + version)
