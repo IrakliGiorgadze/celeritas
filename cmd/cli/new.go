@@ -60,7 +60,7 @@ func doNew(appName string) {
 		}
 		defer source.Close()
 
-		destination, err := os.Create(fmt.Sprintf("./%s/Makefile.mac", appName))
+		destination, err := os.Create(fmt.Sprintf("./%s/Makefile", appName))
 		if err != nil {
 			exitGracefully(err)
 		}
@@ -77,7 +77,7 @@ func doNew(appName string) {
 		}
 		defer source.Close()
 
-		destination, err := os.Create(fmt.Sprintf("./%s/Makefile.mac", appName))
+		destination, err := os.Create(fmt.Sprintf("./%s/Makefile", appName))
 		if err != nil {
 			exitGracefully(err)
 		}
