@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
@@ -72,4 +74,42 @@ func showHelp() {
 	make session          - creates a table in the database as a session store
 
 	`)
+}
+
+func updateSourceFiles(path string, fi os.FileInfo, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if fi.IsDir() {
+		return nil
+	}
+
+	matched, err := filepath.Match("*.go", fi.Name())
+	if err != nil {
+		return err
+	}
+
+	if matched {
+		read, err := os.ReadFile(path)
+		if err != nil {
+			exitGracefully(err)
+		}
+
+		newContents := strings.Replace(string(read), "myapp", appURL, -1)
+
+		err = os.WriteFile(path, []byte(newContents), 0)
+		if err != nil {
+			exitGracefully(err)
+		}
+	}
+
+	return nil
+}
+
+func updateSource() {
+	err := filepath.Walk(".", updateSourceFiles)
+	if err != nil {
+		exitGracefully(err)
+	}
 }
